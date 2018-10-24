@@ -1,0 +1,10 @@
+primero:
+medimos con misma frec de sampleo y distintas frec de rampa para ver si con cambios mas abruptos de voltaje por tiempo se rompe la sincronía de los chuncks. (repetimos para fs de sampleo tanqui, 1000, y para fs grande, 48000).
+
+segundo:
+en modo RSE (con el generador flotante y cada pin referido a un pin de ground del daq)
+mandamos dos señales de rampa con misma frec de señal en cada uno de los canales. y con misma frec de sampleo en ambos canales. queremos ver si la placa mide la señal de cada canal en paralelo o primero uno y despues el otro. si pasa lo segundo (que es lo que sabemos que sucede) la medicion i-esima del ch1 va a ser x Volt y la del ch2 x + dx V.
+
+YA EN MODO STREAMING
+en RSE tambien
+mandamos dos rampas de misma frec a cada canal pero con volt muy distintos. los dos ch con misma frec de sampleo, queremos ver que si la difrencia de voltaje entre los canales es muy grande, la placa tarda mas en medir la señal de un canal y pasar para medir el otro.

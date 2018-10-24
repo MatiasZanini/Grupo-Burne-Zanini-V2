@@ -11,6 +11,11 @@ interchunk48000 = np.loadtxt('barrido_frec_rampa0.01_48000.txt', delimiter = '\t
 #plt.plot(interchunk48000)
 #plt.plot(interchunk48000[int(1.2E6):int(2.3E6)])
 interchunk48000 = interchunk48000[int(1.2E6):int(2.3E6)]
+
+path = r'D:\ALUMNOS\GitHub\Grupo-Burne-Zanini-V2\Mediciones/'
+sens10kHz = np.loadtxt(path+'sensibilidad_señal_rampa_frec_10000Hz_sample_48000.txt', delimiter = '\t', unpack = True)
+plt.plot(sens10kHz[:2048])
+#plt.plot(sens10kHz)
 #%%
 #tomamos un flanco creciente de la senal de rampa
 
