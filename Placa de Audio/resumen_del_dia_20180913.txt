@@ -1,0 +1,7 @@
+logramos hacer funcionar playrec. 
+	Errores:
+		-al ejecutarlo por segunda vez tira el error "local variable datos is refered before assigned"
+		-siempre mide mientras este activo el stream de emitir. Entonces si todavia queda tiempo de la señal
+		y no terminamos de grabar, vuelve a empezar con toda la duracion.
+		-solo graba un chunk (el ultimo)
+		-el resultado final tira un float en vez de un array

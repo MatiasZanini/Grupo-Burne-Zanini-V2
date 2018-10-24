@@ -1,0 +1,6 @@
+ALL0000	
+	Contiene los datos de la medicion con la clase clase_voltaje.py usando
+	Señal.Armonica(500,500). La captura de pantalla no muestra las mediciones
+
+ALL0001	
+	Repetimos y guardamos las mediciones en la captura. Señal.Armonica(500,100)

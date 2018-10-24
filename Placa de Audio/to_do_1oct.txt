@@ -1,0 +1,2 @@
+-Ver como se guarda el array grabacion de voltaje_sd.py con dos channels de inputs.
+-ejecutar el barrido en frecuencias

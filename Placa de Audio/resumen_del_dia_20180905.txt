@@ -1,0 +1,28 @@
+5 de sept
+
+Hoy probamos la función emitir (de clase_voltaje.py) desde el emision_medicion.py. El modo bloqueo funcionaba ok pero el modo callback tiraba el error "attribute time.sleep error". El problema era en realidad que la función callback_emision estaba mal hecha y cuando se corría el "while active" de la función emitir saltaba el problema y se frenaba el código. El error en callback_emision era que estabamos queriendo leer frames de la variable "senal" usando "senal.readframes", pero readframes es un atributo que sólo sirve en archivos wav, y nuestra variable senal no lo era.
+
+Después de solucionar logramos que funcionara la emisión con callback, pero la señal que veíamos en el oscilosocpio era un seno con saltos en todos los períodos. Lo que estaba pasando era que la función callback estaba llamando sólo a los primeros 1024 bits de "senal" y en la segunda llamada volvía a correr los mismos primeros 1024 puntos y así infinitamente; entonces en el osciloscopio veíamos una secuencia de pedazos de la señal que no se pegaban de forma continua. Además, cuando forzabamos el frenado de la corrida, la función callback quedaba corriendo de fondo porque nunca llegaba a correrse el stream.terminate de la función emitir. Hernan agregó unas líneas en la función emitir para que se termine el stream SIEMPRE y no quedé la compu colgada mandando la señal. Sobre la repetición de los primeros mismos 1024 puntos, Hernan nos escribió unas líneas en el archivo emision_medicion.py para que la función callback_emision corriera a partir de un generador que permite ir barriendo la señal de a 1024 puntos (que es lo que puede leer stream_callback por cada llamado de callback) pero moviéndose cada vez a los 1024 siguientes hasta barrer la señal completa.
+
+Con esto tenemos la función emitir modo callback funcionando correctamente.
+
+Ahora, lo que queremos nosotros es poder medir mientras se ejecuta la emisión con callback. Un detalle sobre esto: el hecho de que callback libera el intérprete no significa que podemos escribir otro comando en la consola, si no que Python puede ejecutar las líneas que siguen a continuación de aquella donde se ejecuta el stream (con callback), ie, NO se frena en esa línea hasta que se termine de emitir la señal. O sea que todo lo que querramos hacer mientras se ejecuta la emisión lo tenemos que pedir en el "while active". Repito para insistir, ese while significa: mientras se esté ejecutando el stream con callback hace todo lo que te indique acá.
+
+Hasta ahora en el while sólo teníamos la pausa para dar tiempo entre un callback y otro. Hoy armamos una nueva función que se llama "playrec" que es como la parte modo callback de "emitir" pero agregando en el while una variable "medicion". Esta variable en realidad hace un llamado a la función "medir" y permite correrla adentro del while sin tener que copiar todo el choclo de esta función. O sea, en playrec pusimos como tercer parametro "medicion" y, a la hora de llamar a playrec, lo que hacemos es llenar el tercer parámetro con "volt.medir(tiempo que queremos medir)". La función corre (ie, no tira error) pero mide primero y después hace la emisión con callback. Hay que ver dónde nos equivocamos para que empiece a emitir antes de que se termine la grabación.
+
+Un comentario sobre la función "medir": le borramos el if del callback porque seguro estaba mal programado y no lo vamos a necesitar con playrec.
+
+Sobre el tema del modo estéreo. Vamos a necesitar comunicarnos en modo estereo porque para medir la curva IV del diodo, por ejemplo, queremos medir la señal que efectivamente está entrando al diodo (a partir de la que le emitimos) y la señal que sale. O sea, vamos a necesitar un pin de la ficha conectada al paralante para emitir la señal, pero dos pines de la ficha conectada al micrófono para medir esta señal sobre el circuito y la señal de salida luego del diodo.
+
+Además, nos insistieron con el tema de escribir las funciones con arrays y pasarlas a string en vez de strings con chr porque agiliza mucho más la ejecución de la función (del código en sí).
+
+TO DO (actualizado):
+	en casa:
+	-ver si podemos solcionar el orden en que se ejecuta la medición y emisión en playrec (si podemos hacerlo sin las cosas del labo)
+	-cambiar los strings de las funciones a arrays convertidos
+	-ver lo de modo estéreo
+	en el labo:
+	-caracterizar la placa como instrumento de emisión/medición
+	-levatar algunos parámetros claves de 1 componente electrónico discreto y 1 integrado (después de la semana de la AFA vamos a tener que entregar una 	especie de informe/protocolo+hoja de datos)
+
+PLAN: dijimos de juntarnos el miércoles que viene a la mañana en el INFIP para asegurarnos de que tenemos el código andando para la tarde (pedir protoboard, ficha de audio, etc en el labo). También dijimos que si es necesario vamos a usar el miércoles de la semana de la AFA (que no hay clases) para ir al labo y medir lo que nos falte.

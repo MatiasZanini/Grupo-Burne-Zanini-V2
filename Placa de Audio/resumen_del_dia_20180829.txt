@@ -1,0 +1,42 @@
+﻿Resumen del día:
+----------------
+	Sabemos que la placa de nuestra compu trabaja en el rango -0.6V 0.6V. Es decir, las señales que se pueden generar con la placa tendrán una amplitud máxima de 1.20Vpp. Tuvimos que hacer unos cambios en el script porque estaba escrito pensando que la placa funcionaba entre 0 y 5V.
+
+	Trabajamos con el scrip clase_voltaje.py
+
+	Probamos enviar señales armónicas y constantes a la placa de video. Vimos que la placa no acepta señales constantes porque tiene un filtro pasa-altos que mata las señales de muy baja frecuencia. Como resultado preliminar sabemos que puede emitir señales de frecuencia 10Hz o mayores y ya para frecuencias del orden de 0.1Hz deja de funcionar. No llegamos a hacer un barrido de frecuencias como para estudiar la respuesta de la	placa y saber cuál es nuestro rango dinámico al usarla como "generador"/"osciloscopio". Además, queremos ver qué pasa en frecuencias cercanas al	bitrate.
+	Sacamos un print de la pantalla del osciloscopio en una de las emisiones de señales armónicas (de 500Hz de frecuencia y 100s de duración). La deformación de la señal sinusoidal se debe a que el volumen (que regula la amplitud de la onda) estaba muy alto y la señal saturaba. Al bajarlo se solucionó.
+		
+	Otra cosa que nos quedó pendiente es ver si el bitrate con el que funciona la placa queda predeterminado por el valor que le indicamos en nuestro script o por el valor que está predeterminado por Windows y, en cambio, hay que adecuar el script a ese valor.
+
+	Avanzamos en el tema de emisión y medición "simultánea". La idea es usar la función callback, en principio, para emitir una señal en un thread de fondo y liberar el intérprete de python para poder ejecutar las mediciones. Como paso siguiente queremos usar dos funciones callbacks, una para emitir y otra para medir, y así tener el intérprete liberado para ejecutar otros comandos.
+		
+Sobre la función callback:
+--------------------------
+
+	para emitir/medir una señal, pyaudio tiene que iniciar un stream. Esto se puede hacer en modo "bloqueo" en el que el intérprete de python ejecuta los comandos de forma secuencial de principio a fin, bloqueándose para otras funciones. O se puede hacer en modo "callback". En este segundo modo el stream se inicia, con stream.stream_start(), pero no se "escribe". Para esto hay que agregar un argumento más a la función stream de pyaudio, que es stream_callback = función. Esa función que pide el argumento de stream necesariamente tiene que tener 4 argumentos (por exigencia de stream_callback) y tiene la información de la señal que se quiere emitir; la llamamos callback directamente. La info de que ya se inició el stream queda en la memoria de pyhton y se lo escribe para emitir la señal en un thread paralelo al interprete a través de callback (no bloquea la ejecución de otros comandos). O sea, se llama a la función callback cuando se quiere emitir señal. Como si se llamara a la señal toda de una podría demandar mucha memoria, lo que hace callback en realidad es traer a la señal de a pedazos. Para eso, en la definición de la función callback se define como data (input que recibe el stream) a una dada cantidad de puntos de la señal completa. Cuando callback termina de traer el primer pedazo de señal pasará al siguiente y así sucesivamente hasta barrer todos los frames y completar la señal. Si medimos mientras emitimos, para cuando terminemos de medir los primeros puntos de la señal ya tendremos el segundo set de puntos para continuar la medición y así hasta completarla. (Acá van a entrar en juego los desfasajes entre emisión y medición). Además, entre cada llamado de cada pedazo de señal se pide un delay, de tal forma que no se esté usando la función callback continuamente y no saturar la memoria.
+	Ejemplo de función calback:
+
+	def callback(in_data, frame_count, time_info, status):  #stream_callback pide una función de 4 argumentos.
+		data = wf.readframes(frame_count) #pedazo de señal
+		return (data, pyaudio.paContinue)
+
+Sobre la señal armónica que tenemos hasta el momento:
+-----------------------------------------------------
+
+	pyaudio recibe como input un string entre 0 y 256 bits codificado a partir de la función chr. El problema es que está función sólo acepta argumentos positivos, lo que nos limita a trabajar en la mitad del rango dinámico de la placa (aunque podemos modificar el volumen para compensar este límite en las amplitudes que le podemos pedir con Python). Por esto estaría bueno evitar recurrir a esta función chr, y trabajar con arrays convertidos a strings.
+
+To do:
+------
+	En casa
+	-hacer funciones callback para emitir y medir {ya están hechas pero hay que checkear la de medición}
+	-modificar el script para trabajar en stereo
+	-agregar otro tipo de ondas (cuadrada, diente de cierra) {listo}
+	-definir los strings de otra forma para no tener que usar chr
+
+	En el labo
+	-respuesta en frecuencias de la placa (ver qué pasa cerca del bitrate)
+	-ver si el bitrate lo fuerza Windows o Python
+	-medir curvas características de algunos componentes electrónicos
+
+	

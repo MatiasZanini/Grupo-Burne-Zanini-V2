@@ -1,0 +1,3 @@
+de los datos que tomamos de la onda triangular, hay que tomar un flanco ascendente, y restar los puntos consecutivamente. Esperamos ver que entre chunk y chunk haya un valor no constante.
+
+hay que verificar que en la rampa ascendente haya mas de 1024 puntos, sino no nos sirve.
