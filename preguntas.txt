@@ -1,0 +1,6 @@
+-Como se aplica el resultado del PID al actuador? El resultado se le resta al valor actual? Se divide? Se pone tal cual sale?
+
+-Para el integrador necesito tener varios valores acumulados.. tengo que llamar al PID cada cierto tiempo? O tengo que
+almacenar todos los datos siempre y llamarlo cuando quiera y decirle que tome todos los datos hasta el momento?
+
+-si llamamos al PID dentro del propio while True, vamos a estar trabajando siempre con un solo valor para la funcion error... como integramos eso en el PID, si este necesita varios valores para integrar?
