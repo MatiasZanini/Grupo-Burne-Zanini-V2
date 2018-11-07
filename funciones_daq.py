@@ -1,21 +1,52 @@
 
 import numpy as np
 import nidaqmx as daq
+from nidaqmx.types import CtrTime
 import math
+from nidaqmx.constants import LineGrouping
+import time
 
 
 #%% 
 
 #--------------------------Medir voltaje analógico-------------------------------
 
+
+
+
 def medir_volt_anal():
     with daq.Task() as task:
-         task.ai_channels.add_ai_voltage_chan("Dev1/ai0")
+         task.ai_channels.add_ai_voltage_chan("Dev9/ai0")
          voltaje=task.read()
          return voltaje
-         
 
 
+#def prender_digital_lapso(tiempo):   
+#    with daq.Task() as task:
+#        task.do_channels.add_do_chan(
+#            'Dev6/port0/line0',
+#            line_grouping=LineGrouping.CHAN_PER_LINE)
+#    
+#        print(task.write(True))
+#        #time.sleep(tiempo)
+#        #print(task.write(False))   
+        
+def prender_digital():   
+    with daq.Task() as task:
+        task.do_channels.add_do_chan(
+            'Dev9/port0/line0',
+            line_grouping=LineGrouping.CHAN_PER_LINE)
+    
+        print(task.write(True))
+
+
+def apagar_digital():   
+    with daq.Task() as task:
+        task.do_channels.add_do_chan(
+            'Dev9/port0/line0',
+            line_grouping=LineGrouping.CHAN_PER_LINE)
+    
+        print(task.write(False))    
 
 #%%
 #-------------------------------Medición continua----------------------------
@@ -32,15 +63,15 @@ def medir_senal_anal(duracion, fs, chunk=1024, modo='dif'):
     cant_med=math.floor(cant_puntos/chunk)+1
     with daq.Task() as task:
         if modo == 'dif':
-            ai0 = task.ai_channels.add_ai_voltage_chan("Dev5/ai0",
+            ai0 = task.ai_channels.add_ai_voltage_chan("Dev9/ai0",
                                                        terminal_config=daq.constants.TerminalConfiguration.DIFFERENTIAL)
         elif modo == 'rse':
-            ai0 = task.ai_channels.add_ai_voltage_chan("Dev5/ai0",
+            ai0 = task.ai_channels.add_ai_voltage_chan("Dev9/ai0",
                                                        terminal_config=daq.constants.TerminalConfiguration.RSE)
         else:
-            ai0 = task.ai_channels.add_ai_voltage_chan("Dev5/ai0",
+            ai0 = task.ai_channels.add_ai_voltage_chan("Dev9/ai0",
                                                        terminal_config=daq.constants.TerminalConfiguration.RSE)
-            ai1 = task.ai_channels.add_ai_voltage_chan("Dev5/ai1",
+            ai1 = task.ai_channels.add_ai_voltage_chan("Dev9/ai1",
                                                        terminal_config=daq.constants.TerminalConfiguration.RSE)
                                                        
         task.timing.cfg_samp_clk_timing(fs)
