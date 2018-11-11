@@ -57,14 +57,25 @@ for i in range(10): #ploteamos los 10 primeros chuncks nomas porque son demasiad
 #%%
 #-------------------------------Estudio de aliasing----------------------------
 
-signal = np.loadtxt('señal_sinusoidal_frec_100Hz_sample_200.txt', delimiter = '\t', unpack = True)
+signal = np.loadtxt(r"C:\Users\Mati\Documents\GitHub\Grupo-Burne-Zanini-V2\Mediciones\mediciones 17-10\señal_sinusoidal_frec_100Hz_sample_200.txt", delimiter = '\t', unpack = True)
 
 plt.plot(signal, '.-')
 N = len(signal)
-num_chuncks = int(N/1024)
+num_chuncks = int(N/1000)
 for i in range(num_chuncks-1):
-        plt.axvline(1024*(i+1), color = 'r')
-    
+        plt.axvline(1000*(i+1), color = 'r')
+        
+plt.xlabel('sample')
+plt.ylabel('Voltaje [V]')
+plt.title('Señal sinusoidal de 100 Hz medidos con una frecuencia de sampleo de 100 Hz')
+#plt.title('Ampliación de la señal sinusoidal de 100 Hz, frecuencia de sampleo 4000 Hz, dentro de un chunk')
+plt.grid(True)
+
+#%%
+
+#para hacer una transformada de fourier hay que recortar "signal" en un chunk y despues aplicarle:
+
+# fft= np.fft.fft(señal_recortada)    
     
     
     
