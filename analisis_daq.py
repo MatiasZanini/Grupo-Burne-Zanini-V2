@@ -58,18 +58,19 @@ for i in range(10): #ploteamos los 10 primeros chuncks nomas porque son demasiad
 #-------------------------------Estudio de aliasing----------------------------
 
 signal = np.loadtxt(r"C:\Users\Matías\Documents\GitHub\Grupo-Burne-Zanini-V2\Mediciones\mediciones 17-10\señal_sinusoidal_frec_100Hz_sample_200.txt", delimiter = '\t', unpack = True)
-
 plt.plot(signal, '.-')
 N = len(signal)
 num_chuncks = int(N/1000)
 for i in range(num_chuncks-1):
         plt.axvline(1000*(i+1), color = 'r')
-        
-plt.xlabel('sample')
-plt.ylabel('Voltaje [V]')
-plt.title('Señal sinusoidal de 100 Hz medidos con una frecuencia de sampleo de 100 Hz')
-#plt.title('Ampliación de la señal sinusoidal de 100 Hz, frecuencia de sampleo 4000 Hz, dentro de un chunk')
+plt.tick_params(axis = 'both', which = 'both', width = 2, length = 4, labelsize = 15)        
+plt.xlabel('sample', fontsize=15)
+plt.ylabel('Voltaje [V]', fontsize=15)
+#plt.title('Señal sinusoidal de 100 Hz medidos con una frecuencia de sampleo de 4000 Hz')
 plt.grid(True)
+plt.title('Señal sinusoidal de 100 Hz, frecuencia de muestreo de 200 Hz', fontsize= 15)
+#plt.title('Ampliación de la señal sinusoidal de 100 Hz, frecuencia de sampleo 4000 Hz, dentro de un chunk')
+#plt.grid(True)
 
 #%%
 
@@ -82,6 +83,33 @@ transf = np.fft.fft(signal_rec)
 
 plt.plot(transf)
 plt.grid(True)
-    
-    
+
+#%%
+# Prueba del multiplexor
+
+ch1, ch2 = np.loadtxt(r"C:\Users\Matías\Documents\GitHub\Grupo-Burne-Zanini-V2\Mediciones\mediciones 24-10\simultaneidad2CH_RSE_señal_rampa_frec_5000Hz_sample_24000.txt", delimiter = '\t', unpack = True)
+
+ch1=ch1[:70]
+ch2=ch2[:70]
+pepe=plt.subplot(1,2,1)
+
+plt.plot(ch1, 'r.-', label = 'Ch 1')
+plt.plot(ch2, 'b.-', label = 'Ch 2')
+plt.xlabel('sample')
+plt.ylabel('voltaje [V]')
+plt.title('Señal triangular de 5 kHz a 24000 samples por segundo')
+
+plt.tick_params(axis = 'both', which = 'both', width = 2, lenth = 4, labelsize = 30)
+
+plt.legend(loc = 0, fontsize= 10)
+plt.grid(True)
+
+plt.subplot(1,2,2, sharey=pepe)
+plt.grid(True)
+
+plt.plot(ch1-ch2,'.-')
+plt.xlabel('sample')
+
+plt.title('Resta de las señales de ambos canales')    
+plt.grid(True)    
     
