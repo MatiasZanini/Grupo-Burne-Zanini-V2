@@ -16,7 +16,7 @@ import time
 
 def medir_volt_anal():
     with daq.Task() as task:
-         task.ai_channels.add_ai_voltage_chan("Dev9/ai0")
+         task.ai_channels.add_ai_voltage_chan("Dev10/ai0")
          voltaje=task.read()
          return voltaje
 
@@ -34,7 +34,7 @@ def medir_volt_anal():
 def prender_digital():   
     with daq.Task() as task:
         task.do_channels.add_do_chan(
-            'Dev9/port0/line0',
+            'Dev10/port0/line0',
             line_grouping=LineGrouping.CHAN_PER_LINE)
     
         print(task.write(True))
@@ -43,7 +43,7 @@ def prender_digital():
 def apagar_digital():   
     with daq.Task() as task:
         task.do_channels.add_do_chan(
-            'Dev9/port0/line0',
+            'Dev10/port0/line0',
             line_grouping=LineGrouping.CHAN_PER_LINE)
     
         print(task.write(False))    
@@ -63,15 +63,15 @@ def medir_senal_anal(duracion, fs, chunk=1024, modo='dif'):
     cant_med=math.floor(cant_puntos/chunk)+1
     with daq.Task() as task:
         if modo == 'dif':
-            ai0 = task.ai_channels.add_ai_voltage_chan("Dev9/ai0",
+            ai0 = task.ai_channels.add_ai_voltage_chan("Dev10/ai0",
                                                        terminal_config=daq.constants.TerminalConfiguration.DIFFERENTIAL)
         elif modo == 'rse':
-            ai0 = task.ai_channels.add_ai_voltage_chan("Dev9/ai0",
+            ai0 = task.ai_channels.add_ai_voltage_chan("Dev10/ai0",
                                                        terminal_config=daq.constants.TerminalConfiguration.RSE)
         else:
-            ai0 = task.ai_channels.add_ai_voltage_chan("Dev9/ai0",
+            ai0 = task.ai_channels.add_ai_voltage_chan("Dev10/ai0",
                                                        terminal_config=daq.constants.TerminalConfiguration.RSE)
-            ai1 = task.ai_channels.add_ai_voltage_chan("Dev9/ai1",
+            ai1 = task.ai_channels.add_ai_voltage_chan("Dev10/ai1",
                                                        terminal_config=daq.constants.TerminalConfiguration.RSE)
                                                        
         task.timing.cfg_samp_clk_timing(fs)
@@ -89,3 +89,23 @@ def medir_senal_anal(duracion, fs, chunk=1024, modo='dif'):
         datos = np.expand_dims(datos, axis=1)
 
     return datos
+    
+    
+    
+#%%
+#-------------------------Crear señal cuadrada con duty cicle-----------------------------
+
+co_channels='Dev10/port0/line0'
+
+with nidaqmx.Task() as task_co:
+    
+    chan_co = daq.configure_pwm(
+            task_co,
+            physical_channels = co_channels,
+            frequency = pwm_freq,
+            duty_cycle = pwm_duty_cycle
+            )
+    
+    
+    
+    

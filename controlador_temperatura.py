@@ -83,9 +83,33 @@ trans = np.loadtxt(path+'transitorio_8V_500fs_enfriamiento.txt', delimiter = '\t
 plt.plot(trans)
 
 #%% Controlador on_off
-
-temp_onoff = control_on_off(55,65)
-
-np.savetxt(path+'temperatura_control_onoff.txt', temp_onoff, delimiter = '\t')
+fdaq.apagar_digital()
+temp_onoff = control_on_off(58,62)
+num = 3
+np.savetxt(path+'temperatura_control_onoff_{}.txt'.format(num), temp_onoff, delimiter = '\t')
 
 plt.plot(temp_onoff)
+
+#%%
+
+temp_ = np.loadtxt(path+'mediciones 7-11/temperatura_control_onoff.txt', delimiter = '\t', unpack = True)
+plt.plot(temp_)
+
+
+
+
+
+
+
+#%% ---------------------PID--------------------------------
+
+duty= 0.5
+
+stream_co.write_one_sample_pulse_frequency(
+                    frequency = chan_co.co_pulse_freq,
+                    duty_cycle = duty
+                    )
+
+
+
+
