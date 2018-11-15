@@ -147,7 +147,7 @@ sample_sup_umbr_48000  = hist_saltos(conj_48000[:10000], 48000, 0.01, umbral_480
 
 #%% -------------------- ONDA TRIANGULAR DE 1Vpp ALTA FREC (10Hz) Y MIDIENDO CON fs = 48000Hz-------------------------------------------
 
-path2 = r'C:\Users\sofia\Documents\Facultad\Instrumentación y control\mediciones 24-10\conjuncion_chuncks_altafrec/'
+path2 = r'C:\Users\sofia\Documents\Facultad\Instrumentación y control\2.daq\mediciones 24-10\conjuncion_chuncks_altafrec/'
 
 
 fr_10 = np.loadtxt(path2+'sensibilidad_señal_rampa_frec_10Hz_sample_48000.txt', delimiter = '\t', unpack =  True)
@@ -190,4 +190,7 @@ plt.xlabel(r'$\Delta Sample$', fontsize = 40)
 plt.grid(axis = 'both', which = 'both', alpha = 0.8, linewidth = 2, linestyle = '--')
 
 
-
+#tradusco diferencias de voltajes entre chunks a tiempos
+delta_v_chunks = np.array([delta_fr10[1000], delta_fr10[2000], delta_fr10[3000], delta_fr10[4000]])
+m = 5 #esto es 1/pendiente de la rampa
+delta_t_chunks = np.abs(m*delta_v_chunks)
