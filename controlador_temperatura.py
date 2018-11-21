@@ -110,6 +110,9 @@ stream_co.write_one_sample_pulse_frequency(
                     duty_cycle = duty
                     )
 
+from clase_daq import DAQ
 
+mydaq = DAQ(7)
+mydaq.medir_senal_anal()
 
 
