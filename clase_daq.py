@@ -94,16 +94,20 @@ class DAQ:
         
     #%%
     #-------------------------Crear señal cuadrada con duty cicle-----------------------------
-    def actuador(self, duty, setpoint, wait = 2.11):    
-                             
-        while True:
-              with ndaq.Task() as wtask:
-                    wtask.co_channels.add_co_pulse_chan_freq(self.prefix +'ctr0', freq=366, duty_cycle=duty) #366 es el maximo valor de frecuencia
-                    wtask.timing.cfg_implicit_timing(sample_mode=AcquisitionType.CONTINUOUS) 
-                    #no emite nada por default
-                    #si no le ponemos CONTINUOUS no emite nada.
-                    wtask.start()
-                    time.sleep(wait)
-                    
-    
+    def pulso(self, duty, freq = 366, wait = 2.11):
+        
+        duty = np.clip(duty,0.00001,0.99999)
+        
+        with ndaq.Task() as wtask:
+            print('a')
+            wtask.co_channels.add_co_pulse_chan_freq(self.prefix +'ctr0', freq, duty_cycle=duty) #366 es el maximo valor de frecuencia
+            print('b')            
+            wtask.timing.cfg_implicit_timing(sample_mode=AcquisitionType.CONTINUOUS) 
+            #no emite nada por default
+            #si no le ponemos CONTINUOUS no emite nada.
+            print('c')            
+            wtask.start()
+            print('d')
+            time.sleep(wait)
+            print('e')        
     

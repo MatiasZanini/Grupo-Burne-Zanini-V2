@@ -82,7 +82,7 @@ def periodo(data, sample_rate):
 #--------- Emision y Medicion en simultaneo  ------------------
 
 with nidaqmx.Task() as rtask: 
-    conf_medir(rtask, sample_rate)
+    
     act = .5
     periodo_ref = 0.01
     while True:

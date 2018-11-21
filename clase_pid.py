@@ -27,12 +27,12 @@ class PIDController:
 
 
 
-lazo = PIDController(42, 3, 2, 1)
-
-while True:
-
-    signal = read()
-
-    actuator = lazo.calculate(signal)
-
-    write(actuator)
+#lazo = PIDController(42, 3, 2, 1)
+#
+#while True:
+#
+#    signal = read()
+#
+#    actuator = lazo.calculate(signal)
+#
+#    write(actuator)

@@ -6,13 +6,15 @@ Created on Wed Nov  7 15:39:06 2018
 """
 #%%
 import numpy as np
-import funciones_daq as fdaq
+#import funciones_daq as fdaq
 from importlib import reload
 import matplotlib.pyplot as plt
+from clase_daq import DAQ
+from clase_pid import PIDController as PID
 
 #%%
 
-reload(fdaq)
+reload(DAQ)
 #%%
 
 
@@ -47,15 +49,15 @@ def control_on_off(minimo, maximo): #la linea dig se mantiene en el estado indic
     try: 
         while True:
             
-            senal = fdaq.medir_volt_anal()
+            senal = DAQ.medir_volt_anal()
             print(senal)
                     
             senal_completa = np.append(senal_completa, senal)
             
             if senal < minimo:
-                fdaq.prender_digital()
+                DAQ.prender_digital()
             elif senal > maximo:
-                fdaq.apagar_digital()
+                DAQ.apagar_digital()
             else:
                 pass
     except KeyboardInterrupt:
@@ -65,9 +67,9 @@ def control_on_off(minimo, maximo): #la linea dig se mantiene en el estado indic
 
 #%% Medir transitorio (como se calienta R desde T ambiente)
 
-fdaq.prender_digital()
-transitorio = fdaq.medir_senal_anal(20,500)
-fdaq.apagar_digital()
+DAQ.prender_digital()
+transitorio = DAQ.medir_senal_anal(20,500)
+DAQ.apagar_digital()
 
 transitorio_stack = np.hstack(transitorio)
 
@@ -83,7 +85,9 @@ trans = np.loadtxt(path+'transitorio_8V_500fs_enfriamiento.txt', delimiter = '\t
 plt.plot(trans)
 
 #%% Controlador on_off
-fdaq.apagar_digital()
+mydaq = DAQ(1)
+
+mydaq.apagar_digital()
 temp_onoff = control_on_off(58,62)
 num = 3
 np.savetxt(path+'temperatura_control_onoff_{}.txt'.format(num), temp_onoff, delimiter = '\t')
@@ -103,16 +107,50 @@ plt.plot(temp_)
 
 #%% ---------------------PID--------------------------------
 
-duty= 0.5
+def controlador_pid(dev, kp, ki, kd, setpoint, pulso_inicial = 0.5):
 
-stream_co.write_one_sample_pulse_frequency(
-                    frequency = chan_co.co_pulse_freq,
-                    duty_cycle = duty
-                    )
+    mydaq = DAQ(dev)
+    
+    mypid = PID(setpoint,kp,ki,kd)
+    
+    mydaq.pulso(pulso_inicial)
+    
+    senal_completa = np.array([])
+    
+    try: 
+            while True:
+                
+                temp_actual = mydaq.medir_volt_anal()*100 #temp_actual es temperatura en grados
+                print(temp_actual)
+                        
+                senal_completa = np.append(senal_completa, temp_actual)
+                
+                actuador = mypid.calculate(temp_actual)
+                
+                mydaq.pulso(actuador)
+                
+                
+    except KeyboardInterrupt:
 
-from clase_daq import DAQ
+        np.savetxt('ultima_medicion', senal_completa, delimiter = '\t')        
+        
+        return senal_completa
 
-mydaq = DAQ(7)
-mydaq.medir_senal_anal()
+
+
+datos_temp = controlador_pid(1, 0.5, 0.0, 0.0, 60)
+
+num_medicion = 1
+np.savetxt('controlador_pid_temp{}'.format(num_medicion), datos_temp, delimiter = '\t')
+
+
+
+
+
+
+
+
+
+
 
 
