@@ -31,19 +31,19 @@ class DAQ:
     #        #time.sleep(tiempo)
     #        #print(task.write(False))   
             
-    def prender_digital(self):   
+    def prender_digital(self, line):   
         with ndaq.Task() as task:
             task.do_channels.add_do_chan(
-                self.prefix + 'port0/line0',
+                self.prefix + 'port0/line{}'.format(line),
                 line_grouping=LineGrouping.CHAN_PER_LINE)
         
             print(task.write(True))
     
     
-    def apagar_digital(self):   
+    def apagar_digital(self, line):   
         with ndaq.Task() as task:
             task.do_channels.add_do_chan(
-                self.prefix + 'port0/line0',
+                self.prefix + 'port0/line{}'.format(line),
                 line_grouping=LineGrouping.CHAN_PER_LINE)
         
             print(task.write(False))    
@@ -94,20 +94,31 @@ class DAQ:
         
     #%%
     #-------------------------Crear señal cuadrada con duty cicle-----------------------------
-    def pulso(self, duty, freq = 366, wait = 2.11):
+    def gen_pulso(self, duty, freq = 366):
         
-        duty = np.clip(duty,0.00001,0.99999)
+        duty = np.clip(duty,0.01,0.99)
         
         with ndaq.Task() as wtask:
-            print('a')
-            wtask.co_channels.add_co_pulse_chan_freq(self.prefix +'ctr0', freq, duty_cycle=duty) #366 es el maximo valor de frecuencia
-            print('b')            
+            wtask.co_channels.add_co_pulse_chan_freq(self.prefix + 'ctr0', freq = freq, duty_cycle=duty) #366 es el maximo valor de frecuencia           
+         
             wtask.timing.cfg_implicit_timing(sample_mode=AcquisitionType.CONTINUOUS) 
             #no emite nada por default
             #si no le ponemos CONTINUOUS no emite nada.
-            print('c')            
+           
             wtask.start()
-            print('d')
-            time.sleep(wait)
-            print('e')        
-    
+            yield
+ 
+
+    def pulso_peltier(self, duty, line1=0, line2=1):  
+        
+        if duty <0:
+            self.apagar_digital(line1)            
+            self.prender_digital(line2)
+            
+        else:
+            self.apagar_digital(line2)
+            self.prender_digital(line1)
+        
+        return self.gen_pulso(abs(duty))    
+
+        

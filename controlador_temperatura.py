@@ -14,7 +14,7 @@ from clase_pid import PIDController as PID
 
 #%%
 
-reload(DAQ)
+#reload(DAQ)
 #%%
 
 
@@ -106,29 +106,40 @@ plt.plot(temp_)
 
 
 #%% ---------------------PID--------------------------------
-
+import time
 def controlador_pid(dev, kp, ki, kd, setpoint, pulso_inicial = 0.5):
 
     mydaq = DAQ(dev)
     
     mypid = PID(setpoint,kp,ki,kd)
     
-    mydaq.pulso(pulso_inicial)
+    mydaq.gen_pulso(pulso_inicial)
     
     senal_completa = np.array([])
-    
+
+    gen = mydaq.pulso_peltier(pulso_inicial)
+    next(gen)    
     try: 
-            while True:
-                
-                temp_actual = mydaq.medir_volt_anal()*100 #temp_actual es temperatura en grados
-                print(temp_actual)
-                        
-                senal_completa = np.append(senal_completa, temp_actual)
-                
-                actuador = mypid.calculate(temp_actual)
-                
-                mydaq.pulso(actuador)
-                
+    
+        while True:
+            
+            temp_actual = mydaq.medir_volt_anal()*100 #temp_actual es temperatura en grados
+            
+                    
+            senal_completa = np.append(senal_completa, temp_actual)
+            
+            actuador = mypid.calculate(temp_actual)
+            
+            try:
+                next(gen)
+            except StopIteration:
+                pass
+            
+            print(temp_actual, actuador)
+            gen = mydaq.pulso_peltier(actuador)
+            next(gen)
+            time.sleep(10)
+            
                 
     except KeyboardInterrupt:
 
@@ -138,9 +149,10 @@ def controlador_pid(dev, kp, ki, kd, setpoint, pulso_inicial = 0.5):
 
 
 
-datos_temp = controlador_pid(1, 0.5, 0.0, 0.0, 60)
+datos_temp = controlador_pid(9, 10, 0.0, 0.0, 35)
 
 num_medicion = 1
+
 np.savetxt('controlador_pid_temp{}'.format(num_medicion), datos_temp, delimiter = '\t')
 
 
